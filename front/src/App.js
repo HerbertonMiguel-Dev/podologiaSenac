@@ -1,24 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import PatientDashboard from './pages/patient/PatientDashboard';
+import AppointmentPage from './pages/patient/AppointmentPage';
+import ProfessionalDashboard from './pages/professional/ProfessionalDashboard';
+import SchedulePage from './pages/professional/SchedulePage';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Rotas para Pacientes */}
+        <Route path="/patient/dashboard" element={<PatientDashboard />} />
+        <Route path="/patient/appointments" element={<AppointmentPage />} />
+
+        {/* Rotas para Profissionais */}
+        <Route path="/professional/dashboard" element={<ProfessionalDashboard />} />
+        <Route path="/professional/schedule" element={<SchedulePage />} />
+
+        {/* Rota padrão */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   );
 }
 
