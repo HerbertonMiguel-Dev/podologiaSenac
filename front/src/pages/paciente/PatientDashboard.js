@@ -6,7 +6,6 @@ const PatientDashboard = () => {
     <div>
       <Header title="Dashboard do Paciente" />
       <h2>Bem-vindo ao seu painel de paciente</h2>
-      {/* Adicione mais conteúdo aqui */}
     </div>
   );
 };

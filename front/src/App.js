@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import PatientDashboard from './pages/patient/PatientDashboard';
-import AppointmentPage from './pages/patient/AppointmentPage';
-import ProfessionalDashboard from './pages/professional/ProfessionalDashboard';
-import SchedulePage from './pages/professional/SchedulePage';
+import PatientDashboard from './pages/paciente/PatientDashboard';
+import AppointmentPage from './pages/paciente/AppointmentPage';
+import ProfessionalDashboard from './pages/profissional/ProfessionalDashboard';
+import SchedulePage from './pages/profissional/SchedulePage';
 import NotFound from './components/NotFound';
 
 function App() {
