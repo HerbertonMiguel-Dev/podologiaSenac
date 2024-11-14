@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/HomeProfessional.css'; // CSS file for styling
+import '../../styles/HomeProfissional.css'; // CSS file for styling
 
 function Login() {
     return (

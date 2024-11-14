@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import PatientDashboard from './pages/paciente/PatientDashboard';
 import AppointmentPage from './pages/paciente/AppointmentPage';
-import ProfessionalDashboard from './pages/profissional/ProfessionalDashboard';
+import ProfessionalDashboard from './pages/profissional/ProfissionalDashboard';
+import FichadoPaciente from './pages/profissional/FichadoPaciente';
+import HomeProfissional from './pages/profissional/HomeProfissional';
 import SchedulePage from './pages/profissional/SchedulePage';
 import NotFound from './components/NotFound';
 
@@ -17,7 +19,9 @@ function App() {
 
         {/* Rotas para Profissionais */}
         <Route path="/professional/dashboard" element={<ProfessionalDashboard />} />
-        <Route path="/professional/schedule" element={<SchedulePage />} />
+        <Route path="/professional/Home" element={<HomeProfissional />} />
+        <Route path="/professional/FichadoPaciente" element={<FichadoPaciente />} />
+        <Route path="/professional/Dashboard" element={<ProfessionalDashboard />} />
 
         {/* Rota padrão */}
         <Route path="*" element={<NotFound />} />
