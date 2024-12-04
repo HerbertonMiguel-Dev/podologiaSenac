@@ -16,9 +16,7 @@ const HealthAssessment = ({ health, onUpdateHealth }) => {
 				{conditions.map((condition) => (
 					<div
 						key={condition.key}
-						className={
-							"flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-						}
+						className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
 					>
 						<span className="text-sm text-gray-700 font-medium">
 							{condition.name}
@@ -27,11 +25,13 @@ const HealthAssessment = ({ health, onUpdateHealth }) => {
 							{["SIM", "NÃO"].map((option) => (
 								<label
 									key={option}
-									className={`flex items-center gap-2 cursor-pointer rounded-md px-2 py-1 transition 
+									className={`flex items-center gap-2 cursor-pointer rounded-md px-4 py-2 transition 
 										${
 											health[condition.key] === option
-												? "ring-2 ring-orange-500 bg-orange-50"
-												: "hover:bg-gray-100"
+												? option === "SIM"
+													? "bg-green-100 text-green-700 ring-2 ring-green-500"
+													: "bg-red-100 text-red-700 ring-2 ring-red-500"
+												: "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
 										}`}
 								>
 									<input
@@ -45,7 +45,7 @@ const HealthAssessment = ({ health, onUpdateHealth }) => {
 										className="hidden"
 										aria-label={`${condition.name}: ${option}`}
 									/>
-									<span className="text-sm text-gray-700">{option}</span>
+									<span className="text-sm">{option}</span>
 								</label>
 							))}
 						</div>

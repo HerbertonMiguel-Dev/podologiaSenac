@@ -1,15 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "../../api/axios"; // Importa o axios configurado
 import { Calendario } from "../../components/Agendamentos/Calendario";
 import { Header } from "../../components/Agendamentos/Header";
 import { ListaAgendamentos } from "../../components/Agendamentos/ListaAgendamentos";
-import { formatDateToKey, mockupAgendamentos } from "../../data/agendamentos";
+import { formatDateToKey } from "../../data/agendamentos";
 
 const Agendamentos = () => {
-	// Define currentDate e selectedDate como a data atual
 	const hoje = new Date();
 	const [currentDate, setCurrentDate] = useState(hoje);
 	const [selectedDate, setSelectedDate] = useState(hoje);
-	const [agendamentos, setAgendamentos] = useState(mockupAgendamentos);
+	const [agendamentos, setAgendamentos] = useState({});
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchAgendamentos = async () => {
+			try {
+				// Usando axios para fazer a requisição
+				const response = await api.get("/agendamento/listar"); // URL da sua API configurada com o axios
+				const data = response.data; // A resposta é armazenada em 'data'
+
+				// Organize os dados de agendamentos por data
+				const agendamentosFormatados = {};
+
+				// Usando for...of para iterar sobre os dados
+				for (const agendamento of data) {
+					const dateKey = formatDateToKey(
+						new Date(agendamento.dataAgendamento),
+					);
+
+					// Organize os agendamentos pela chave da data
+					if (!agendamentosFormatados[dateKey]) {
+						agendamentosFormatados[dateKey] = {
+							totalVagas: 1, // ou outro valor que represente o total de vagas
+							agendamentos: [],
+						};
+					}
+
+					agendamentosFormatados[dateKey].agendamentos.push({
+						...agendamento,
+						paciente: agendamento.paciente,
+						problemas: JSON.parse(agendamento.problemasSelecionados), // Converter problemas de string para array
+					});
+				}
+
+				setAgendamentos(agendamentosFormatados);
+			} catch (error) {
+				console.error("Erro ao carregar agendamentos:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchAgendamentos();
+	}, []);
 
 	const diasDaSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 	const meses = [
@@ -95,29 +138,36 @@ const Agendamentos = () => {
 		return `${dia}/${mes}/${ano}`;
 	};
 
-	const handleRemoveAgendamento = (agendamentoId) => {
+	const handleRemoveAgendamento = async (agendamentoId) => {
 		if (window.confirm("Tem certeza que deseja remover este agendamento?")) {
-			const dateKey = formatDateToKey(selectedDate);
+			try {
+				// Remover o agendamento via API
+				await api.delete(`/agendamentos/${agendamentoId}`);
+				// Atualizar o estado após a remoção
+				const dateKey = formatDateToKey(selectedDate);
 
-			setAgendamentos((prevAgendamentos) => {
-				const newAgendamentos = { ...prevAgendamentos };
+				setAgendamentos((prevAgendamentos) => {
+					const newAgendamentos = { ...prevAgendamentos };
 
-				if (newAgendamentos[dateKey]) {
-					newAgendamentos[dateKey] = {
-						...newAgendamentos[dateKey],
-						agendamentos: newAgendamentos[dateKey].agendamentos.filter(
-							(agendamento) => agendamento.id !== agendamentoId,
-						),
-					};
+					if (newAgendamentos[dateKey]) {
+						newAgendamentos[dateKey] = {
+							...newAgendamentos[dateKey],
+							agendamentos: newAgendamentos[dateKey].agendamentos.filter(
+								(agendamento) => agendamento.id !== agendamentoId,
+							),
+						};
 
-					// Remove a data se não houver mais agendamentos
-					if (newAgendamentos[dateKey].agendamentos.length === 0) {
-						delete newAgendamentos[dateKey];
+						// Remove a data se não houver mais agendamentos
+						if (newAgendamentos[dateKey].agendamentos.length === 0) {
+							delete newAgendamentos[dateKey];
+						}
 					}
-				}
 
-				return newAgendamentos;
-			});
+					return newAgendamentos;
+				});
+			} catch (error) {
+				console.error("Erro ao remover agendamento:", error);
+			}
 		}
 	};
 
@@ -131,28 +181,30 @@ const Agendamentos = () => {
 	return (
 		<div className="max-w-7xl mx-auto p-6 font-sans">
 			<Header />
-
-			<div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
-				<div className="space-y-6">
-					<Calendario
-						currentDate={currentDate}
+			{loading ? (
+				<div>Carregando agendamentos...</div>
+			) : (
+				<div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
+					<div className="space-y-6">
+						<Calendario
+							currentDate={currentDate}
+							selectedDate={selectedDate}
+							diasDaSemana={diasDaSemana}
+							meses={meses}
+							diasCalendario={diasCalendario}
+							mudarMes={mudarMes}
+							selecionarData={selecionarData}
+						/>
+					</div>
+					<ListaAgendamentos
 						selectedDate={selectedDate}
-						diasDaSemana={diasDaSemana}
-						meses={meses}
-						diasCalendario={diasCalendario}
-						mudarMes={mudarMes}
-						selecionarData={selecionarData}
+						agendamentos={dadosDoDia.agendamentos}
+						totalVagas={dadosDoDia.totalVagas}
+						formatarData={formatarData}
+						onRemoveAgendamento={handleRemoveAgendamento}
 					/>
 				</div>
-
-				<ListaAgendamentos
-					selectedDate={selectedDate}
-					agendamentos={dadosDoDia.agendamentos}
-					totalVagas={dadosDoDia.totalVagas}
-					formatarData={formatarData}
-					onRemoveAgendamento={handleRemoveAgendamento}
-				/>
-			</div>
+			)}
 		</div>
 	);
 };

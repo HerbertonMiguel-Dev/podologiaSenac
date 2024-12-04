@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // Certifique-se de configurar seu .env
+}
+
+model Paciente {
+  id           Int           @id @default(autoincrement())
+  nome         String
+  email        String        @unique
+  telefone     String
+  cpf          String        @unique
+  diabetes     Boolean?
+  hipertensao  Boolean?
+  cardiopatia  Boolean?
+  marcapasso   Boolean?
+  gestante     Boolean?
+  agendamentos Agendamento[] // Relacionamento 1:N com Agendamento
+}
+
+model Agendamento {
+  id                    Int      @id @default(autoincrement())
+  dataAgendamento       DateTime
+  pacienteId            Int
+  paciente              Paciente @relation(fields: [pacienteId], references: [id])
+  problemasSelecionados String?
+  status                String   @default("pendente") 
+}
+
+model Vaga {
+  id         Int      @id @default(autoincrement())
+  data       DateTime
+  totalVagas Int
+  disponivel Int      @default(0)
+}
