@@ -1,7 +1,4 @@
- 
-
-```markdown
-# Sistema de Gestão para Podologia (Projeto Integrador turma 235)
+ # Sistema de Gestão para Podologia (Projeto Integrador turma 235)
 
 Este projeto é composto por um back-end e dois front-ends distintos: um para o gerenciamento de podólogos e outro para o gerenciamento de pacientes.
 
