@@ -15,6 +15,13 @@ const PersonalInfoForm = ({ formData, onUpdateForm }) => (
 			/>
 		</div>
 		<input
+			type="number"
+			placeholder="digite sua idade"
+			className="w-full px-3 py-2 border border-gray-300 rounded-md"
+			value={formData.idade}
+			onChange={(e) => onUpdateForm("idade", e.target.value)}
+		/>
+		<input
 			type="email"
 			placeholder="E-mail"
 			className="w-full px-3 py-2 border border-gray-300 rounded-md"

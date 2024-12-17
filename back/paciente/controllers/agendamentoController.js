@@ -8,6 +8,7 @@ exports.criarAgendamento = async (req, res) => {
 			cpf,
 			nome,
 			email,
+			idade,
 			telefone,
 			dataAgendamento,
 			problemasSelecionados,
@@ -25,6 +26,7 @@ exports.criarAgendamento = async (req, res) => {
 				data: {
 					cpf,
 					nome,
+					idade,
 					email,
 					telefone,
 					...mapearCondicoes(condicoesDeSaude),
@@ -102,22 +104,26 @@ exports.criarAgendamento = async (req, res) => {
 
 exports.listarAgendamentos = async (req, res) => {
 	try {
-		// Busca todos os agendamentos, incluindo as informações do paciente e dos problemas selecionados
 		const agendamentos = await prisma.agendamento.findMany({
 			include: {
 				paciente: true, // Inclui as informações do paciente
 			},
 		});
 
-		// Retorna os agendamentos encontrados
-		res.status(200).json(agendamentos);
+		// Filtra agendamentos que possuem paciente válido
+		const agendamentosComPaciente = agendamentos.filter(a => a.paciente !== null);
+
+		res.status(200).json(agendamentosComPaciente);
 	} catch (error) {
-		console.error("Erro completo:", error);
-		res
-			.status(500)
-			.json({ error: "Erro ao listar agendamentos", detalhes: error.message });
+		console.error("Erro ao listar agendamentos:", error);
+		res.status(500).json({
+			error: "Erro ao listar agendamentos",
+			detalhes: error.message,
+		});
 	}
 };
+
+
 
 exports.concluirAgendamento = async (req, res) => {
 	try {

@@ -7,18 +7,38 @@ datasource db {
   url      = env("DATABASE_URL") // Certifique-se de configurar seu .env
 }
 
+model Usuario {
+  id String @id @default(uuid())
+  nome String
+  email String  @unique
+  senha String
+
+  criado_em DateTime? @default(now())
+  atualizado_em DateTime? @default(now())
+
+  @@map("usuarios")
+  
+  pacientes Paciente[]
+
+}
+
 model Paciente {
   id           Int           @id @default(autoincrement())
   nome         String
   email        String        @unique
   telefone     String
   cpf          String        @unique
+  idade        String
   diabetes     Boolean?
   hipertensao  Boolean?
   cardiopatia  Boolean?
   marcapasso   Boolean?
   gestante     Boolean?
   agendamentos Agendamento[] // Relacionamento 1:N com Agendamento
+
+  @@map("pacientes")
+  usuario   Usuario? @relation(fields: [usuario_id], references: [id])
+  usuario_id String?
 }
 
 model Agendamento {

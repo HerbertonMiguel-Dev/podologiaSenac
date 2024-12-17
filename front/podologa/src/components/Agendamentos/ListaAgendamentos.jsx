@@ -11,6 +11,8 @@ import {
 import api from "../../api/axios";
 import { LiberarVagas } from "./LiberarVagas";
 
+import Modal from "../ModalPaciente/Modal";
+
 export const ListaAgendamentos = ({
   selectedDate,
   agendamentos,
@@ -20,7 +22,12 @@ export const ListaAgendamentos = ({
   fetchData, // Função para atualizar os dados
 }) => {
   const [vagas, setVagas] = useState(null); // Estado para armazenar as vagas
+  const [showModal, setShowModal] = useState(false);
   const vagasDisponiveis = vagas ? vagas.totalVagas - agendamentos.length : 0;
+
+  const handleDetalhes = (paciente) => {
+    setShowModal(true); // Abre o modal
+  };
 
   // Buscar as vagas para a data selecionada
   useEffect(() => {
@@ -80,11 +87,10 @@ export const ListaAgendamentos = ({
                 {agendamentos.length} agendados
               </span>
               <span
-                className={`px-3 py-1 rounded text-sm ${
-                  vagasDisponiveis > 0
-                    ? "bg-green-100 text-green-600"
-                    : "bg-red-100 text-red-600"
-                }`}
+                className={`px-3 py-1 rounded text-sm ${vagasDisponiveis > 0
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
+                  }`}
               >
                 {vagasDisponiveis} disponíveis
               </span>
@@ -128,11 +134,10 @@ export const ListaAgendamentos = ({
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span
-                    className={`text-sm px-2 py-1 rounded ${
-                      agendamento.status === "CONFIRMADO"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
+                    className={`text-sm px-2 py-1 rounded ${agendamento.status === "CONFIRMADO"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                      }`}
                   >
                     {agendamento.status}
                   </span>
@@ -140,10 +145,39 @@ export const ListaAgendamentos = ({
               </div>
               {/* Informações adicionais do paciente */}
               {agendamento.paciente.email && (
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                  <Mail className="w-4 h-4" />
-                  <span>{agendamento.paciente.email}</span>
+                <div className="space-y-2 text-sm text-gray-600 mb-1">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    <span>{agendamento.paciente.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Idade: {agendamento.paciente.idade} anos</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Telefone: {agendamento.paciente.telefone}</span>
+                  </div>
+                  <button
+                    className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                    onClick={() => handleDetalhes(agendamento.paciente)}
+                  >
+                    Detalhes
+                  </button>
                 </div>
+              )}
+
+              {showModal && (
+                <Modal onClose={() => setShowModal(false)}>
+                  <h2>Detalhes do Paciente</h2>
+                  <p>Nome: {agendamento.paciente.nome}</p>
+                  <p>Idade: {agendamento.paciente.idade} anos</p>
+                  <p>Email: {agendamento.paciente.email}</p>
+                  <p>Telefone: {agendamento.paciente.telefone}</p>
+                  <p>Diabetes: {agendamento.paciente.diabetes ? 'Sim' : 'Não'}</p>
+                  <p>Hipertensão: {agendamento.paciente.hipertensao ? 'Sim' : 'Não'}</p>
+                  <p>Cardiopatia: {agendamento.paciente.cardiopatia ? 'Sim' : 'Não'}</p>
+                  <p>Marcapasso: {agendamento.paciente.marcapasso ? 'Sim' : 'Não'}</p>
+                  <p>Gestante: {agendamento.paciente.gestante ? 'Sim' : 'Não'}</p>
+                </Modal>
               )}
             </div>
           ))

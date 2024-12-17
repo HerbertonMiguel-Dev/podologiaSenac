@@ -6,6 +6,7 @@ exports.createPaciente = async (req, res) => {
 	try {
 		const {
 			nome,
+			idade,
 			cpf,
 			email,
 			telefone,
@@ -15,11 +16,13 @@ exports.createPaciente = async (req, res) => {
 			marcapasso,
 			gestante,
 		} = req.body;
+		
 
 		// Criação do paciente com condições de saúde
 		const paciente = await prisma.paciente.create({
 			data: {
 				nome,
+				idade,
 				cpf,
 				email,
 				telefone,

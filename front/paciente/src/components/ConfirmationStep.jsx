@@ -26,6 +26,11 @@ const ConfirmationStep = ({ formData, onConfirm }) => {
 					{formData.name || "Não informado"}
 				</p>
 
+				<h3 className="font-medium text-gray-800 mb-2">Idade</h3>
+				<p className="text-sm text-gray-600">
+					{formData.idade || "Não informado"} anos
+				</p>
+
 				<h3 className="font-medium text-gray-800 mt-4 mb-2">CPF</h3>
 				<p className="text-sm text-gray-600">
 					{formData.cpf || "Não informado"}
