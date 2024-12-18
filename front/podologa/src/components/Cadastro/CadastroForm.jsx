@@ -3,6 +3,10 @@ import { useAuth } from "../../../src/context/AuthContext"; // Importando o Auth
 import { useNavigate } from "react-router-dom"; // Importando o useNavigate
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Ícones para mostrar/ocultar senha
 
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Estilos padrão
+import "./toastStyles.css"; // Arquivo CSS personalizado
+
 const CadastroForm = () => {
   const { signUp } = useAuth(); // Obtendo a função signUp
   const [nome, setNome] = useState("");
@@ -20,19 +24,30 @@ const CadastroForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Tentando cadastrar usuário...");
 
     if (senha !== confirmarSenha) {
       setErro("As senhas não coincidem");
-      return;
+      console.log("Erro: As senhas não coincidem.");
+    
+      
+      setTimeout(() => {
+        setErro("");
+      }, 2000); 
+
+      return; // Impede o cadastro
     }
 
     try {
       await signUp(nome, email, senha);  // Chamando a função signUp do contexto
+      console.log("Usuário cadastrado com sucesso!");
       setSucesso("Usuário cadastrado com sucesso!"); // Exibe mensagem de sucesso
       setTimeout(() => {
-        navigate("/"); // Redireciona para a página de login após 2 segundos
-      }, 2000);
+
+        navigate("/"); // Redireciona para a página de login após 3 segundos
+      }, 3000);
     } catch (error) {
+      console.error("Erro ao cadastrar:", error.message);
       setErro(error.message);
     }
   };
@@ -40,7 +55,11 @@ const CadastroForm = () => {
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-6">
       {erro && <p className="text-red-500">{erro}</p>}
-      {sucesso && <p className="text-green-500">{sucesso}</p>} {/* Exibe a mensagem de sucesso */}
+      {sucesso && (
+        <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-md shadow-md animate-fadeIn">
+          <p className="font-semibold">{sucesso}</p>
+        </div>
+      )}
       <div className="space-y-4">
         <input
           type="text"

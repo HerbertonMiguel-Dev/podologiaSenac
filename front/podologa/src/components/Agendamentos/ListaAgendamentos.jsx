@@ -19,27 +19,28 @@ export const ListaAgendamentos = ({
   formatarData,
   onRemoveAgendamento,
   onConcluirAgendamento,
-  fetchData, // Função para atualizar os dados
+  fetchData,
 }) => {
-  const [vagas, setVagas] = useState(null); // Estado para armazenar as vagas
+  const [vagas, setVagas] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
   const vagasDisponiveis = vagas ? vagas.totalVagas - agendamentos.length : 0;
 
   const handleDetalhes = (paciente) => {
-    setShowModal(true); // Abre o modal
+    setPacienteSelecionado(paciente);
+    setShowModal(true);
   };
 
-  // Buscar as vagas para a data selecionada
   useEffect(() => {
     const fetchVagas = async () => {
       try {
         const response = await api.get(
           `/vagas/listar-vagas-por-dia/${selectedDate.toISOString().split("T")[0]}`
         );
-        setVagas(response.data); // Atualiza o estado com as vagas
+        setVagas(response.data);
       } catch (error) {
         console.error("Erro ao buscar vagas:", error);
-        setVagas(null); // Garante que vagas será null em caso de erro
+        setVagas(null);
       }
     };
 
@@ -51,20 +52,48 @@ export const ListaAgendamentos = ({
   const handleDeleteAgendamento = async (agendamentoId) => {
     try {
       await api.delete(`/agendamento/${agendamentoId}`);
-      if (onRemoveAgendamento) {
-        onRemoveAgendamento(agendamentoId);
-      }
+      const novaLista = agendamentos.filter(
+        (agendamento) => agendamento.id !== agendamentoId
+      );
+      window.location.reload();
+      fetchData(novaLista);
     } catch (error) {
       console.error("Erro ao deletar agendamento:", error);
+      alert("Agendamento excluido com sucesso");
     }
   };
 
   const handleConcluirAgendamento = async (agendamentoId) => {
     try {
       await api.put(`/agendamento/${agendamentoId}/concluir`);
+      const atualizado = agendamentos.map((agendamento) =>
+        agendamento.id === agendamentoId
+          ? { ...agendamento, status: "FINALIZADO" }
+          : agendamento
+      );
+  
+      const pendentes = atualizado.filter(
+        (agendamento) => agendamento.status !== "FINALIZADO"
+      );
+      const finalizados = atualizado.filter(
+        (agendamento) => agendamento.status === "FINALIZADO"
+      );
+  
+      // Mover o agendamento concluído para o final da lista
+      const agendamentoConcluido = atualizado.find(
+        (agendamento) => agendamento.id === agendamentoId
+      );
+  
+      if (agendamentoConcluido) {
+        finalizados.unshift(agendamentoConcluido);
+      }
+  
       if (onConcluirAgendamento) {
         onConcluirAgendamento(agendamentoId);
       }
+  
+      window.location.reload();
+      fetchData([...pendentes, ...finalizados]);
     } catch (error) {
       console.error("Erro ao concluir agendamento:", error);
     }
@@ -87,10 +116,11 @@ export const ListaAgendamentos = ({
                 {agendamentos.length} agendados
               </span>
               <span
-                className={`px-3 py-1 rounded text-sm ${vagasDisponiveis > 0
-                  ? "bg-green-100 text-green-600"
-                  : "bg-red-100 text-red-600"
-                  }`}
+                className={`px-3 py-1 rounded text-sm ${
+                  vagasDisponiveis > 0
+                    ? "bg-green-100 text-green-600"
+                    : "bg-red-100 text-red-600"
+                }`}
               >
                 {vagasDisponiveis} disponíveis
               </span>
@@ -105,12 +135,8 @@ export const ListaAgendamentos = ({
       </div>
 
       <div className="space-y-4">
-        {/* Renderiza LiberarVagas quando não há vagas */}
         {(!vagas || vagas.totalVagas === 0) ? (
-          <LiberarVagas
-            selectedDate={selectedDate}
-            fetchData={fetchData} // Atualiza os dados após criar vagas
-          />
+          <LiberarVagas selectedDate={selectedDate} fetchData={fetchData} />
         ) : agendamentos.length > 0 ? (
           agendamentos.map((agendamento) => (
             <div
@@ -121,64 +147,58 @@ export const ListaAgendamentos = ({
                 <div className="flex items-center gap-2 flex-grow">
                   <User className="w-4 h-4 text-gray-500" />
                   <span className="font-medium">{agendamento.paciente.nome}</span>
-                  {["pendente", "confirmado"].includes(agendamento.status) && (
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteAgendamento(agendamento.id)}
-                      className="p-1 rounded-full hover:bg-red-50 transition-colors group"
-                      aria-label="Remover agendamento"
-                    >
-                      <X className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
-                    </button>
-                  )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span
-                    className={`text-sm px-2 py-1 rounded ${agendamento.status === "CONFIRMADO"
+                    className={`text-sm px-2 py-1 rounded ${
+                      agendamento.status === "CONFIRMADO"
                       ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                      }`}
+                      : agendamento.status === "pendente"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : agendamento.status === "Finalizado"
+                      ? "bg-red-300 text-yellow-700"
+                      : ""
+                    }`}
                   >
                     {agendamento.status}
                   </span>
                 </div>
               </div>
-              {/* Informações adicionais do paciente */}
-              {agendamento.paciente.email && (
-                <div className="space-y-2 text-sm text-gray-600 mb-1">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    <span>{agendamento.paciente.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>Idade: {agendamento.paciente.idade} anos</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>Telefone: {agendamento.paciente.telefone}</span>
-                  </div>
+
+              <div className="space-y-2 text-sm text-gray-600 mb-1">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  <span>{agendamento.paciente.email || "Sem e-mail"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>Idade: {agendamento.paciente.idade || "N/A"} anos</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>
+                    Telefone: {agendamento.paciente.telefone || "Sem telefone"}
+                  </span>
+                </div>
+                <div className="flex space-x-2">
                   <button
                     className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
                     onClick={() => handleDetalhes(agendamento.paciente)}
                   >
                     Detalhes
                   </button>
+                  <button
+                    className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300"
+                    onClick={() => handleConcluirAgendamento(agendamento.id)}
+                  >
+                    Concluir atendimento
+                  </button>
+                  <button
+                    className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+                    onClick={() => handleDeleteAgendamento(agendamento.id)}
+                  >
+                    Excluir
+                  </button>
                 </div>
-              )}
-
-              {showModal && (
-                <Modal onClose={() => setShowModal(false)}>
-                  <h2>Detalhes do Paciente</h2>
-                  <p>Nome: {agendamento.paciente.nome}</p>
-                  <p>Idade: {agendamento.paciente.idade} anos</p>
-                  <p>Email: {agendamento.paciente.email}</p>
-                  <p>Telefone: {agendamento.paciente.telefone}</p>
-                  <p>Diabetes: {agendamento.paciente.diabetes ? 'Sim' : 'Não'}</p>
-                  <p>Hipertensão: {agendamento.paciente.hipertensao ? 'Sim' : 'Não'}</p>
-                  <p>Cardiopatia: {agendamento.paciente.cardiopatia ? 'Sim' : 'Não'}</p>
-                  <p>Marcapasso: {agendamento.paciente.marcapasso ? 'Sim' : 'Não'}</p>
-                  <p>Gestante: {agendamento.paciente.gestante ? 'Sim' : 'Não'}</p>
-                </Modal>
-              )}
+              </div>
             </div>
           ))
         ) : (
@@ -187,6 +207,21 @@ export const ListaAgendamentos = ({
           </div>
         )}
       </div>
+
+      {showModal && pacienteSelecionado && (
+        <Modal onClose={() => setShowModal(false)}>
+          <h2>Detalhes do Paciente</h2>
+          <p>Nome: {pacienteSelecionado.nome}</p>
+          <p>Idade: {pacienteSelecionado.idade} anos</p>
+          <p>Email: {pacienteSelecionado.email}</p>
+          <p>Telefone: {pacienteSelecionado.telefone}</p>
+          <p>Diabetes: {pacienteSelecionado.diabetes ? 'Sim' : 'Não'}</p>
+          <p>Hipertensão: {pacienteSelecionado.hipertensao ? 'Sim' : 'Não'}</p>
+          <p>Cardiopatia: {pacienteSelecionado.cardiopatia ? 'Sim' : 'Não'}</p>
+          <p>Marcapasso: {pacienteSelecionado.marcapasso ? 'Sim' : 'Não'}</p>
+          <p>Gestante: {pacienteSelecionado.gestante ? 'Sim' : 'Não'}</p>
+        </Modal>
+      )}
     </div>
   );
 };

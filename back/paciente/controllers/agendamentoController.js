@@ -145,7 +145,7 @@ exports.concluirAgendamento = async (req, res) => {
 
 		const agendamentoAtualizado = await prisma.agendamento.update({
 			where: { id: agendamento.id },
-			data: { status: "concluído" },
+			data: { status: "Finalizado" },
 		});
 
 		// Atualiza a vaga, incrementando as vagas disponíveis

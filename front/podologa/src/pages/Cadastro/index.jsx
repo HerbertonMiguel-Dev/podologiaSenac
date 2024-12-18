@@ -5,7 +5,7 @@ import CadastroForm from "../../components/Cadastro/CadastroForm";
 import CadastroLink from "../../components/Cadastro/CadastroLink";
 import ForgotPasswordLink from "../../components/Login/ForgotPasswordLink";
 
-const Login = () => (
+const Cadastro = () => (
 	<div className="min-h-screen flex items-center justify-center bg-gray-50">
 		<div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
 			<Logo className="mx-auto"/>
@@ -17,4 +17,4 @@ const Login = () => (
 	</div>
 );
 
-export default Login;
+export default Cadastro;

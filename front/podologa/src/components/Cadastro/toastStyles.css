@@ -1,0 +1,20 @@
+/* toastStyles.css */
+
+.custom-toast {
+    background-color: #4caf50 !important; /* Fundo verde */
+    color: #fff !important; /* Texto branco */
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .custom-toast .Toastify__progress-bar {
+    background-color: #388e3c !important; /* Barra de progresso verde-escura */
+  }
+  
+  .custom-toast .Toastify__close-button {
+    color: #fff !important; /* Botão de fechar branco */
+  }
+  

@@ -5,6 +5,8 @@ import { Header } from "../../components/Agendamentos/Header";
 import { ListaAgendamentos } from "../../components/Agendamentos/ListaAgendamentos";
 import { formatDateToKey } from "../../data/agendamentos";
 
+import { canSSRAuth } from '../../utils/canSSRAuth'
+
 const Agendamentos = () => {
   const hoje = new Date();
   const [currentDate, setCurrentDate] = useState(hoje);
@@ -175,3 +177,13 @@ const Agendamentos = () => {
 };
 
 export default Agendamentos;
+
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+
+  return {
+    props: {
+
+    }
+  }
+
+})
