@@ -173,6 +173,7 @@ const Agendamentos = () => {
       const idade = agendamento.paciente.idade || "idade não definido";
       const telefone = agendamento.paciente.telefone || "telefone não definido";
       const cpf = agendamento.paciente.cpf || "cpf não definido";
+      const problemas = agendamento.problemasSelecionados || "Problema não definido";
       const status = agendamento.status || "Status não definido"; // Ajuste para lidar com valores indefinidos
 
       doc.text(`Paciente: ${pacienteNome}`, 10, yPosition);
@@ -184,6 +185,8 @@ const Agendamentos = () => {
       doc.text(`Telefone: ${telefone}`, 10, yPosition);
       yPosition += 10;
       doc.text(`Cpf: ${cpf}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Problemas: ${problemas}`, 10, yPosition);
       yPosition += 10;
       doc.text(`Status: ${status}`, 10, yPosition);
       yPosition += 20; // Adiciona um espaço extra entre os agendamentos

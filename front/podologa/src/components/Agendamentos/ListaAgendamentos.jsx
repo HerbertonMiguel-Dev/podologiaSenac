@@ -28,6 +28,7 @@ export const ListaAgendamentos = ({
 
   const handleDetalhes = (paciente) => {
     setPacienteSelecionado(paciente);
+    
     setShowModal(true);
   };
 
@@ -117,8 +118,8 @@ export const ListaAgendamentos = ({
               </span>
               <span
                 className={`px-3 py-1 rounded text-sm ${vagasDisponiveis > 0
-                    ? "bg-green-100 text-green-600"
-                    : "bg-red-100 text-red-600"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
                   }`}
               >
                 {vagasDisponiveis} disponíveis
@@ -149,12 +150,12 @@ export const ListaAgendamentos = ({
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span
                     className={`text-sm px-2 py-1 rounded ${agendamento.status === "CONFIRMADO"
-                        ? "bg-green-100 text-green-700"
-                        : agendamento.status === "pendente"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : agendamento.status === "Finalizado"
-                            ? "bg-red-300 text-yellow-700"
-                            : ""
+                      ? "bg-green-100 text-green-700"
+                      : agendamento.status === "pendente"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : agendamento.status === "Finalizado"
+                          ? "bg-red-300 text-yellow-700"
+                          : ""
                       }`}
                   >
                     {agendamento.status}
@@ -176,6 +177,17 @@ export const ListaAgendamentos = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span>CPF: {agendamento.paciente.cpf || "Sem telefone"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>
+                    Informações adicionais: {(() => {
+                      const problemas = Array.isArray(agendamento.problemasSelecionados)
+                        ? agendamento.problemasSelecionados
+                        : JSON.parse(agendamento.problemasSelecionados || "[]");
+
+                      return problemas.length > 0 ? problemas.join(", ") : "Informações adicionais";
+                    })()}
+                  </span>
                 </div>
                 <div className="flex space-x-2">
                   <button
@@ -208,7 +220,7 @@ export const ListaAgendamentos = ({
       </div>
 
 
-      {showModal && pacienteSelecionado && (
+      {showModal && pacienteSelecionado  &&(
         <Modal onClose={() => setShowModal(false)}>
           <h2>Detalhes do Paciente</h2>
           <p>Nome: {pacienteSelecionado.nome}</p>
@@ -220,6 +232,7 @@ export const ListaAgendamentos = ({
           <p>Cardiopatia: {pacienteSelecionado.cardiopatia ? 'Sim' : 'Não'}</p>
           <p>Marcapasso: {pacienteSelecionado.marcapasso ? 'Sim' : 'Não'}</p>
           <p>Gestante: {pacienteSelecionado.gestante ? 'Sim' : 'Não'}</p>
+
         </Modal>
       )}
     </div>

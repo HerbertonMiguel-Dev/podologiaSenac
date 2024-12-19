@@ -28,6 +28,32 @@ const AppointmentScheduler = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isStepValid, setIsStepValid] = useState(false); // Novo estado para controlar a validação do passo atual
 
+  // Função para validar o CPF
+  const validateCPF = (cpf) => {
+    cpf = cpf.replace(/[^\d]+/g, ""); // Remove pontuações
+    if (cpf.length !== 11) return false; // Verifica se o CPF tem 11 dígitos
+    if (/^(\d)\1{10}$/.test(cpf)) return false; // Verifica se o CPF é uma sequência de números iguais
+
+    let soma = 0;
+    let resto;
+    for (let i = 0; i < 9; i++) {
+      soma += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(9))) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+      soma += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(10))) return false;
+
+    return true;
+  };
+
   const handleConfirm = async () => {
     console.log("Estado do formData antes da requisição:", formData);
 
@@ -64,6 +90,7 @@ const AppointmentScheduler = () => {
     if (!formData.idade.trim()) errors.idade = "A idade é obrigatória.";
     if (!formData.phone.trim()) errors.phone = "O telefone é obrigatório.";
     if (!formData.cpf.trim()) errors.cpf = "O CPF é obrigatório.";
+    if (!validateCPF(formData.cpf)) errors.cpf = "CPF inválido."; // Valida o CPF
     if (!formData.date) errors.date = "A data é obrigatória.";
 
     setErrorMessages(errors);
@@ -216,12 +243,12 @@ const AppointmentScheduler = () => {
               type="button"
               onClick={handleNext}
               className={`px-6 py-2 rounded-md ml-auto ${isStepValid
-                  ? "bg-orange-500 text-white"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                ? "bg-orange-500 text-white"
+                : "bg-gray-400 text-gray-800 cursor-not-allowed"
                 }`}
-              disabled={!isStepValid} // Botão desabilitado se o passo atual não for válido
+              disabled={!isStepValid}
             >
-              Próximo
+              Avançar
             </button>
           )}
         </div>
@@ -234,6 +261,7 @@ const AppointmentScheduler = () => {
           setTimeout(() => {
             setCurrentStep(1); // Redireciona para o passo 1 após 3 segundos
           }, 3000); // 3000 milissegundos = 3 segundos
+          window.location.reload(); // Recarrega a página após o tempo
         }}
         name={formData.name}
       />
