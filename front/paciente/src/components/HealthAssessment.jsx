@@ -5,12 +5,14 @@ const HealthAssessment = ({ health, onUpdateHealth }) => {
 		{ name: "Cardiopatia", key: "cardiopatia" },
 		{ name: "Marcapasso", key: "marcapasso" },
 		{ name: "Gestante", key: "gestante" },
+		{ name: "Oncológico", key: "oncologico" },
+		{ name: "Platina/Pino", key: "platina" },
 	];
 
 	return (
 		<div>
 			<h3 className="text-lg font-semibold text-gray-800 mb-6">
-				Avaliação de saúde
+				Dados Clínicos
 			</h3>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{conditions.map((condition) => (

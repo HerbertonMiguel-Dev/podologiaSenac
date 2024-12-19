@@ -24,12 +24,13 @@ const AppointmentScheduler = () => {
     problem: [],
     healthConditions: {},
   });
+  const [errorMessages, setErrorMessages] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isStepValid, setIsStepValid] = useState(false); // Novo estado para controlar a validação do passo atual
 
   const handleConfirm = async () => {
     console.log("Estado do formData antes da requisição:", formData);
 
-    // Usando dayjs para formatar a data para 'YYYY-MM-DD'
     const dataFormatada = dayjs(formData.date).format("YYYY-MM-DD");
     console.log(dataFormatada);
 
@@ -57,18 +58,37 @@ const AppointmentScheduler = () => {
     }
   };
 
+  const validateFields = () => {
+    const errors = {};
+    if (!formData.name.trim()) errors.name = "O nome é obrigatório.";
+    if (!formData.idade.trim()) errors.idade = "A idade é obrigatória.";
+    if (!formData.phone.trim()) errors.phone = "O telefone é obrigatório.";
+    if (!formData.cpf.trim()) errors.cpf = "O CPF é obrigatório.";
+    if (!formData.date) errors.date = "A data é obrigatória.";
+
+    setErrorMessages(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleNext = async () => {
-    if (currentStep === 3) {
+    if (currentStep === 1) {
+      setCurrentStep(currentStep + 1);
+      setIsStepValid(false); // Reseta o estado para o próximo passo
+    } else if (currentStep === 2) {
+      if (validateFields()) {
+        setCurrentStep(currentStep + 1);
+        setIsStepValid(false); // Reseta o estado para o próximo passo
+      }
+    } else if (currentStep === 3) {
       await handleConfirm();
       setShowSuccessModal(true);
-    } else {
-      setCurrentStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      setIsStepValid(true); // Permite navegação de volta sem bloquear o botão
     }
   };
 
@@ -82,6 +102,39 @@ const AppointmentScheduler = () => {
       date: newDate,
       selectedDay: day,
     });
+    setErrorMessages((prev) => ({ ...prev, date: null })); // Remove o erro de data
+    setIsStepValid(true); // Libera o botão para o próximo passo
+  };
+
+  const handleFieldUpdate = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    setErrorMessages((prev) => ({ ...prev, [field]: null })); // Remove erro ao atualizar o campo
+
+    if (currentStep === 2) {
+      const areFieldsValid =
+        formData.name.trim() &&
+        formData.idade.trim() &&
+        formData.phone.trim() &&
+        formData.cpf.trim();
+
+      setIsStepValid(areFieldsValid); // Atualiza a validade do botão
+    }
+  };
+
+  // Função para verificar se os campos obrigatórios estão preenchidos
+  const areRequiredFieldsFilled = () => {
+    if (currentStep === 1) {
+      return !!formData.date; // Apenas a data é necessária no passo 1
+    }
+    if (currentStep === 2) {
+      return (
+        formData.name.trim() &&
+        formData.idade.trim() &&
+        formData.phone.trim() &&
+        formData.cpf.trim()
+      ); // Todos os campos são necessários no passo 2
+    }
+    return false;
   };
 
   return (
@@ -114,9 +167,8 @@ const AppointmentScheduler = () => {
               <div>
                 <PersonalInfoForm
                   formData={formData}
-                  onUpdateForm={(field, value) =>
-                    setFormData({ ...formData, [field]: value })
-                  }
+                  onUpdateForm={handleFieldUpdate} // Atualiza o formulário com a função modificada
+                  errorMessages={errorMessages}
                 />
                 <ProblemSelection
                   selectedProblems={formData.problem}
@@ -163,12 +215,11 @@ const AppointmentScheduler = () => {
             <button
               type="button"
               onClick={handleNext}
-              className={`px-6 py-2 rounded-md ml-auto ${
-                formData.date
+              className={`px-6 py-2 rounded-md ml-auto ${isStepValid
                   ? "bg-orange-500 text-white"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
-              disabled={!formData.date} // Desabilita o botão se a data não estiver selecionada
+                }`}
+              disabled={!isStepValid} // Botão desabilitado se o passo atual não for válido
             >
               Próximo
             </button>
@@ -178,7 +229,12 @@ const AppointmentScheduler = () => {
 
       <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
+        onClose={() => {
+          setShowSuccessModal(false); // Fecha o modal
+          setTimeout(() => {
+            setCurrentStep(1); // Redireciona para o passo 1 após 3 segundos
+          }, 3000); // 3000 milissegundos = 3 segundos
+        }}
         name={formData.name}
       />
     </div>

@@ -1,28 +1,20 @@
-import { parseCookies, setCookie, destroyCookie } from 'nookies';
-import { AuthTokenError } from '../api/errors/AuthTokenError';
+import React, { useEffect } from "react";
+import { parseCookies } from "nookies";
+import { useNavigate } from "react-router-dom";
 
-export const canSSRAuth = (fn) => {
-  return async (ctx) => {
-    const cookies = parseCookies(ctx);
-    const token = cookies['@podologia.token'];
+export const canSSRAuth = (WrappedComponent) => {
+  return (props) => {
+    const navigate = useNavigate();
 
-    if (!token) {
-      return {
-        redirect: {
-          destination: '/',
-          permanent: false,
-        },
-      };
-    }
+    useEffect(() => {
+      const { "@podologia.token": token } = parseCookies();
 
-    try {
-      return await fn(ctx);
-    } catch (err) {
-      if (err instanceof AuthTokenError) {
-        // Não excluir o cookie
-        throw err; // Lança o erro para que o fluxo continue
+      if (!token) {
+        // Redireciona para a página de login
+        navigate("/");
       }
-      // Outras tratativas de erro podem ser feitas aqui
-    }
+    }, [navigate]);
+
+    return <WrappedComponent {...props} />;
   };
 };

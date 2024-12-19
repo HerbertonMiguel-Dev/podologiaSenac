@@ -6,6 +6,7 @@ const ProblemSelection = ({ selectedProblems = [], onSelectProblems }) => {
 		"Unha encravada",
 		"Calos",
 		"Dor intensa no pé",
+		"Frieira",
 		"Não sei responder",
 	];
 

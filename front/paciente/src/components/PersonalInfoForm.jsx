@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const PersonalInfoForm = ({ formData, onUpdateForm }) => (
+
+const PersonalInfoForm = ({ formData, onUpdateForm, }) => (
+	
 	<div className="space-y-4">
 		<div>
 			<h3 className="text-lg font-semibold text-gray-800 mb-6">
@@ -12,6 +14,7 @@ const PersonalInfoForm = ({ formData, onUpdateForm }) => (
 				className="w-full px-3 py-2 border border-gray-300 rounded-md"
 				value={formData.name}
 				onChange={(e) => onUpdateForm("name", e.target.value)}
+				
 			/>
 		</div>
 		<input

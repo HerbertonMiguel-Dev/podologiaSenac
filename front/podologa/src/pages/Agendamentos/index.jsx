@@ -4,6 +4,9 @@ import { Calendario } from "../../components/Agendamentos/Calendario";
 import { Header } from "../../components/Agendamentos/Header";
 import { ListaAgendamentos } from "../../components/Agendamentos/ListaAgendamentos";
 import { formatDateToKey } from "../../data/agendamentos";
+import { parseCookies } from "nookies";
+import { useNavigate } from "react-router-dom";
+import { jsPDF } from "jspdf"; // Importando o jsPDF
 
 import { canSSRAuth } from '../../utils/canSSRAuth'
 
@@ -13,6 +16,17 @@ const Agendamentos = () => {
   const [selectedDate, setSelectedDate] = useState(hoje);
   const [agendamentos, setAgendamentos] = useState({});
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { "@podologia.token": token } = parseCookies();
+
+    if (!token) {
+      // Redireciona para login se o token não existir
+      navigate("/");
+    }
+  }, [navigate]);
 
   // Função para formatar a data
   const formatarData = (data) => {
@@ -144,6 +158,40 @@ const Agendamentos = () => {
     agendamentos: [],
   };
 
+  // Função para gerar o PDF
+  const gerarPdf = () => {
+    const doc = new jsPDF();
+    const data = dadosDoDia.agendamentos;
+
+    doc.text("Lista de Agendamentos", 20, 20);
+
+    // Adiciona cada agendamento ao PDF
+    let yPosition = 30;
+    data.forEach((agendamento) => {
+      const pacienteNome = agendamento.paciente.nome; // Ajuste para acessar a propriedade correta
+      const email = agendamento.paciente.email || "email não definido"; // Ajuste para lidar com valores indefinidos
+      const idade = agendamento.paciente.idade || "idade não definido";
+      const telefone = agendamento.paciente.telefone || "telefone não definido";
+      const cpf = agendamento.paciente.cpf || "cpf não definido";
+      const status = agendamento.status || "Status não definido"; // Ajuste para lidar com valores indefinidos
+
+      doc.text(`Paciente: ${pacienteNome}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Email: ${email}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Idade: ${idade}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Telefone: ${telefone}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Cpf: ${cpf}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Status: ${status}`, 10, yPosition);
+      yPosition += 20; // Adiciona um espaço extra entre os agendamentos
+    });
+
+    doc.save("agendamentos.pdf");
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6 font-sans">
       <Header />
@@ -172,18 +220,11 @@ const Agendamentos = () => {
           />
         </div>
       )}
+      <button onClick={gerarPdf} className="mt-1 p-1 rounded bg-blue-500 text-white">
+        Gerar PDF
+      </button>
     </div>
   );
 };
 
 export default Agendamentos;
-
-export const getServerSideProps = canSSRAuth(async (ctx) => {
-
-  return {
-    props: {
-
-    }
-  }
-
-})

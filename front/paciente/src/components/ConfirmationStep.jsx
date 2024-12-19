@@ -13,8 +13,8 @@ const ConfirmationStep = ({ formData, onConfirm }) => {
 	const formattedDate = formData.date
 		? dayjs(formData.date).isValid()
 			? dayjs(formData.date)
-					.format("dddd, D [de] MMMM [de] YYYY")
-					.replace(/^\w/, (c) => c.toUpperCase()) // Primeira letra maiúscula
+				.format("dddd, D [de] MMMM [de] YYYY")
+				.replace(/^\w/, (c) => c.toUpperCase()) // Primeira letra maiúscula
 			: "Data inválida"
 		: "Nenhuma data selecionada";
 
@@ -50,7 +50,7 @@ const ConfirmationStep = ({ formData, onConfirm }) => {
 					Horário de atendimento
 				</h3>
 				<p className="text-sm text-gray-600">
-					18:00 às 21:00 - Por ordem de chegada
+					a partir das 18:00 horas - Por ordem de chegada
 				</p>
 
 				<h3 className="font-medium text-gray-800 mt-4 mb-2">

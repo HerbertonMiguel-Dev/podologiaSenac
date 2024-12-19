@@ -27,11 +27,11 @@ export const LiberarVagas = ({ selectedDate, fetchData }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow flex flex-col items-center">
-      <h3 className="text-lg font-semibold text-blue-800 mb-6 text-center">
+    <div className="bg-white rounded-lg p-3 shadow flex items-center ">
+      <h3 className="text-lg font-semibold text-blue-800">
         Liberar vagas
       </h3>
-      <div className="flex items-center justify-center gap-6">
+      <div className="flex items-center gap-3">
         <div className="flex flex-col items-center">
           <label
             htmlFor="vagas-input"
@@ -42,7 +42,7 @@ export const LiberarVagas = ({ selectedDate, fetchData }) => {
           <input
             id="vagas-input"
             type="number"
-            className="w-24 border border-gray-300 rounded p-2 text-center"
+            className="w-20 h-8 border border-gray-300 rounded p-2 text-center"
             min="1"
             value={vagas}
             onChange={(e) => setVagas(Number(e.target.value))}
@@ -50,12 +50,16 @@ export const LiberarVagas = ({ selectedDate, fetchData }) => {
         </div>
         <button
           type="button"
-          className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors shadow-md"
-          onClick={handleSubmit}
+          className="bg-blue-500 text-white h-10 px-2 py-2 rounded-md hover:bg-blue-600 transition-colors shadow-md"
+          onClick={() => {
+            handleSubmit();
+            window.location.reload();
+          }}
         >
           CONFIRMAR
         </button>
       </div>
     </div>
+
   );
 };

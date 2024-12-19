@@ -71,27 +71,27 @@ export const ListaAgendamentos = ({
           ? { ...agendamento, status: "FINALIZADO" }
           : agendamento
       );
-  
+
       const pendentes = atualizado.filter(
         (agendamento) => agendamento.status !== "FINALIZADO"
       );
       const finalizados = atualizado.filter(
         (agendamento) => agendamento.status === "FINALIZADO"
       );
-  
+
       // Mover o agendamento concluído para o final da lista
       const agendamentoConcluido = atualizado.find(
         (agendamento) => agendamento.id === agendamentoId
       );
-  
+
       if (agendamentoConcluido) {
         finalizados.unshift(agendamentoConcluido);
       }
-  
+
       if (onConcluirAgendamento) {
         onConcluirAgendamento(agendamentoId);
       }
-  
+
       window.location.reload();
       fetchData([...pendentes, ...finalizados]);
     } catch (error) {
@@ -116,11 +116,10 @@ export const ListaAgendamentos = ({
                 {agendamentos.length} agendados
               </span>
               <span
-                className={`px-3 py-1 rounded text-sm ${
-                  vagasDisponiveis > 0
+                className={`px-3 py-1 rounded text-sm ${vagasDisponiveis > 0
                     ? "bg-green-100 text-green-600"
                     : "bg-red-100 text-red-600"
-                }`}
+                  }`}
               >
                 {vagasDisponiveis} disponíveis
               </span>
@@ -135,9 +134,8 @@ export const ListaAgendamentos = ({
       </div>
 
       <div className="space-y-4">
-        {(!vagas || vagas.totalVagas === 0) ? (
-          <LiberarVagas selectedDate={selectedDate} fetchData={fetchData} />
-        ) : agendamentos.length > 0 ? (
+        <LiberarVagas selectedDate={selectedDate} fetchData={fetchData} />
+        {agendamentos.length > 0 ? (
           agendamentos.map((agendamento) => (
             <div
               key={agendamento.id}
@@ -150,21 +148,19 @@ export const ListaAgendamentos = ({
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span
-                    className={`text-sm px-2 py-1 rounded ${
-                      agendamento.status === "CONFIRMADO"
-                      ? "bg-green-100 text-green-700"
-                      : agendamento.status === "pendente"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : agendamento.status === "Finalizado"
-                      ? "bg-red-300 text-yellow-700"
-                      : ""
-                    }`}
+                    className={`text-sm px-2 py-1 rounded ${agendamento.status === "CONFIRMADO"
+                        ? "bg-green-100 text-green-700"
+                        : agendamento.status === "pendente"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : agendamento.status === "Finalizado"
+                            ? "bg-red-300 text-yellow-700"
+                            : ""
+                      }`}
                   >
                     {agendamento.status}
                   </span>
                 </div>
               </div>
-
               <div className="space-y-2 text-sm text-gray-600 mb-1">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
@@ -177,6 +173,9 @@ export const ListaAgendamentos = ({
                   <span>
                     Telefone: {agendamento.paciente.telefone || "Sem telefone"}
                   </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>CPF: {agendamento.paciente.cpf || "Sem telefone"}</span>
                 </div>
                 <div className="flex space-x-2">
                   <button
@@ -207,6 +206,7 @@ export const ListaAgendamentos = ({
           </div>
         )}
       </div>
+
 
       {showModal && pacienteSelecionado && (
         <Modal onClose={() => setShowModal(false)}>
